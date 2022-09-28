@@ -6,7 +6,6 @@ from datetime import datetime
 import time_se
 import constant
 
-
 FAPI_KLINES_MAX_LIMIT = 1500
 
 
@@ -38,6 +37,7 @@ def klines_by_date(symbol, timeframe, start_date, end_date, console_debug=False)
     unix_end = unix_curr if unix_end > unix_curr else unix_end
 
     df = pd.DataFrame(columns=['time', 'date', 'open', 'high', 'low', 'close'])
+    # df = pd.DataFrame(columns=['time', 'open', 'high', 'low', 'close'])
 
     total_klines = int((unix_end - unix_start) / time_se.tf_to_ms(timeframe))
 
@@ -51,4 +51,5 @@ def klines_by_date(symbol, timeframe, start_date, end_date, console_debug=False)
             print(str(len(df)) + '/' + str(total_klines) + ' is received!')
 
         unix_start = df.iloc[len(df) - 1, 0] + time_se.tf_to_ms(timeframe)
+
     return df
