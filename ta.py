@@ -23,13 +23,13 @@ def pivot_low(df: pd.DataFrame, n):
 
 
 def fixnan(df: pd.DataFrame, column: str):
-    val = np.NaN
+    value = np.NaN
 
     for i in range(0, len(df)):
         if np.isnan(df.at[i, column]):
-            df.at[i, column] = val
+            df.at[i, column] = value
         else:
-            val = df.at[i, column]
+            value = df.at[i, column]
 
     return df
 
@@ -50,3 +50,14 @@ def lowest(df: pd.DataFrame, p):
         df.at[i, 'lowest'] = df.loc[i - p + 1:i + 1, 'low'].min()
 
     return df
+
+
+def barsince(df: pd.DataFrame, column: str, index, value, max_barsince=np.NaN, min_barsince=np.NaN):
+    range1 = 0 if np.isnan(max_barsince) or index - max_barsince < 0 else index - max_barsince
+    range2 = index if np.isnan(min_barsince) else index - min_barsince
+
+    for i in reversed(range(range1, range2)):
+        if df.at[i, column] == value:
+            return index - i
+
+    return np.NaN

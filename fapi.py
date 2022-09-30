@@ -37,7 +37,6 @@ def klines_by_date(symbol, timeframe, start_date, end_date, console_debug=False)
     unix_end = unix_curr if unix_end > unix_curr else unix_end
 
     df = pd.DataFrame(columns=['time', 'date', 'open', 'high', 'low', 'close'])
-    # df = pd.DataFrame(columns=['time', 'open', 'high', 'low', 'close'])
 
     total_klines = int((unix_end - unix_start) / time_se.tf_to_ms(timeframe))
 
