@@ -40,7 +40,7 @@ def klines_by_date(symbol, timeframe, start_date, end_date, console_debug=False)
 
     total_klines = int((unix_end - unix_start) / time_se.tf_to_ms(timeframe))
 
-    while unix_start < unix_end:
+    while unix_start + time_se.tf_to_ms(timeframe) < unix_end:
         df = pd.merge(df, klines(symbol, timeframe, unix_start,
                                  unix_start + time_se.tf_to_ms(timeframe) * FAPI_KLINES_MAX_LIMIT - 1
                                  if unix_start > time_se.tf_to_ms(timeframe) * FAPI_KLINES_MAX_LIMIT
