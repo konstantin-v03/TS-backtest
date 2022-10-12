@@ -1,63 +1,76 @@
 import pandas as pd
+from pandas import Series
+import pandas_ta as pta
 import numpy as np
+import math
 
 
-def pivot_high(df: pd.DataFrame, n):
-    df['pivot_high'] = np.NaN
+def pivothigh(series: Series, n):
+    res = pd.Series(np.NaN, index=series.index)
 
-    for i in range(n * 2, len(df) - 1):
-        if df.at[i - n, 'high'] == df.loc[i - 2 * n:i + 1, 'high'].max():
-            df.at[i, 'pivot_high'] = df.at[i - n, 'high']
+    for i in range(n * 2, len(series) - 1):
+        if series[i - n] == series[i - 2 * n:i + 1].max():
+            res[i] = series.at[i - n]
 
-    return df
-
-
-def pivot_low(df: pd.DataFrame, n):
-    df['pivot_low'] = np.NaN
-
-    for i in range(n * 2, len(df) - 1):
-        if df.at[i - n, 'low'] == df.loc[i - 2 * n:i + 1, 'low'].min():
-            df.at[i, 'pivot_low'] = df.at[i - n, 'low']
-
-    return df
+    return res
 
 
-def fixnan(df: pd.DataFrame, column: str):
+def pivotlow(series: Series, n):
+    res = pd.Series(np.NaN, index=series.index)
+
+    for i in range(n * 2, len(series) - 1):
+        if series[i - n] == series[i - 2 * n:i + 1].min():
+            res[i] = series[i - n]
+
+    return res
+
+
+def fixnan(series: Series):
+    res = series.copy()
     value = np.NaN
 
-    for i in range(0, len(df)):
-        if np.isnan(df.at[i, column]):
-            df.at[i, column] = value
+    for i in range(0, len(series)):
+        if np.isnan(series[i]):
+            res[i] = value
         else:
-            value = df.at[i, column]
+            value = series[i]
 
-    return df
-
-
-def highest(df: pd.DataFrame, p):
-    df['highest'] = np.NaN
-
-    for i in range(p - 1, len(df)):
-        df.at[i, 'highest'] = df.loc[i - p + 1:i + 1, 'high'].max()
-
-    return df
+    return res
 
 
-def lowest(df: pd.DataFrame, p):
-    df['lowest'] = np.NaN
+def highest(series: Series, p):
+    res = pd.Series(np.NaN, index=series.index)
 
-    for i in range(p - 1, len(df)):
-        df.at[i, 'lowest'] = df.loc[i - p + 1:i + 1, 'low'].min()
+    for i in range(p - 1, len(series)):
+        res[i] = series[i - p + 1:i + 1].max()
 
-    return df
+    return res
 
 
-def barsince(df: pd.DataFrame, column: str, index, value, max_barsince=np.NaN, min_barsince=np.NaN):
-    range1 = 0 if np.isnan(max_barsince) or index - max_barsince < 0 else index - max_barsince
-    range2 = index if np.isnan(min_barsince) else index - min_barsince
+def lowest(series: Series, p):
+    res = pd.Series(np.NaN, index=series.index)
 
-    for i in reversed(range(range1, range2)):
-        if df.at[i, column] == value:
+    for i in range(p - 1, len(series)):
+        res[i] = series[i - p + 1:i + 1].min()
+
+    return res
+
+
+def barsince(series: Series, index, value, max_barsince=np.NaN, min_barsince=np.NaN):
+    max_index = 0 if np.isnan(max_barsince) or index - max_barsince < 0 else index - max_barsince
+    min_index = index if np.isnan(min_barsince) else index - min_barsince
+
+    for i in reversed(range(max_index, min_index + 1)):
+        if series[i] == value:
             return index - i
 
     return np.NaN
+
+
+def volatility_index(series: Series, length):
+    log = pd.Series(np.NaN, index=series.index)
+
+    for i in range(1, len(series)):
+        log[i] = math.log(series[i] / series[i - 1])
+
+    return 100 * pta.stdev(log, length, ddof=0)
