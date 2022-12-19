@@ -82,4 +82,8 @@ def calc(df: pd.DataFrame, capital, percent, pyramiding=1, dir_filter=DirFilter.
         if console_debug:
             print(str(i) + '/' + str(len(df)) + ' is calculated!')
 
+    if np.isnan(tdf.at[len(tdf) - 1, 'close']):
+        capital += tdf.at[len(tdf) - 1, 'size'] * tdf.at[len(tdf) - 1, 'open']
+        tdf = tdf[:-1]
+
     return capital, tdf.round(1)

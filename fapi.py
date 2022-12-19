@@ -26,6 +26,8 @@ def klines(symbol, timeframe, start_time=None, end_time=None, limit=None):
         m['close'] = df.iloc[:, 4].astype(float)
 
         return m
+    else:
+        print(r.json())
     return ''
 
 

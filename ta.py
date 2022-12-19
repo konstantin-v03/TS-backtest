@@ -3,6 +3,26 @@ from pandas import Series
 import pandas_ta as pta
 import numpy as np
 import math
+from prophet import Prophet
+
+
+def predict(ds: Series, y: Series, periods: int, freq: str):
+    df = pd.DataFrame()
+    df['ds'] = ds
+    df['y'] = y
+
+    m = Prophet()
+    m.fit(df)
+
+    forecast = m.predict(m.make_future_dataframe(periods=periods,
+                                                 freq=freq))[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+    d = forecast.iloc[- (periods + 1), 1] - y[len(y) - 1]
+    forecast['yhat'] = forecast['yhat'] - d
+    forecast['yhat_lower'] = forecast['yhat_lower'] - d
+    forecast['yhat_upper'] = forecast['yhat_upper'] - d
+
+    return forecast
 
 
 def pivothigh(series: Series, n):

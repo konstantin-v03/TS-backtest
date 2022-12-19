@@ -85,7 +85,6 @@ def points(df: pd.DataFrame,
     df['action'] = np.NaN
     df['long_stop'] = np.NaN
     df['short_stop'] = np.NaN
-    df['debug'] = np.NaN
 
     last_action = ""
     last_action_i = 0
